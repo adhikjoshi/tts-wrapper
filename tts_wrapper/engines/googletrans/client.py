@@ -38,18 +38,22 @@ class GoogleTransClient(AbstractTTS):
                 "Install it with: pip install gtts"
             )
             raise ImportError(msg)
-        if mp3 is None:
-            msg = (
-                "pymp3 is required for GoogleTrans TTS. "
-                "Install it with: pip install pymp3"
-            )
-            raise ImportError(msg)
-
         self.lang, self.tld = self._parse_voice_id(voice_id)
         self.audio_rate = 22050  # Default sample rate for gTTS
 
+    def _require_mp3_codec(self) -> None:
+        if mp3 is None:
+            msg = (
+                "pymp3 is required for GoogleTrans WAV output. "
+                "Install it with: pip install 'py3-tts-wrapper[mp3]' "
+                "or pip install pymp3"
+            )
+            raise ImportError(msg)
+
     def _mp3_to_wav(self, mp3_fp: BytesIO) -> bytes:
         """Converts MP3 data to WAV using pymp3 by decoding PCM and writing WAV headers."""
+        self._require_mp3_codec()
+        assert mp3 is not None
         mp3_fp.seek(0)  # Reset the file pointer
         output = BytesIO()
 

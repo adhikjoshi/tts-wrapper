@@ -1333,7 +1333,8 @@ class AbstractTTS(ABC):
 
             except ImportError:
                 logging.error(
-                    "pymp3 is required for MP3 conversion. Please install it with pip install pymp3"
+                    "pymp3 is required for MP3 conversion. Install it with: "
+                    "pip install 'py3-tts-wrapper[mp3]' or pip install pymp3"
                 )
                 raise
         elif output_format.lower() == "ogg":

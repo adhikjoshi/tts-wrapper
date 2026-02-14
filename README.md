@@ -142,6 +142,11 @@ Install from PyPI with selected engines:
 pip install "py3-tts-wrapper[google,microsoft,sapi,sherpaonnx,googletrans]"
 ```
 
+Install optional MP3 codec support:
+```sh
+pip install "py3-tts-wrapper[mp3]"
+```
+
 Install from GitHub:
 ```sh
 pip install "py3-tts-wrapper[google,microsoft,sapi,sherpaonnx,googletrans]@git+https://github.com/willwade/tts-wrapper"

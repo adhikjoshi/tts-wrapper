@@ -759,16 +759,48 @@ class SherpaOnnxClient(AbstractTTS):
         Returns:
             List of voice dictionaries with raw language information
         """
-        return [
-            {
-                "id": voice["id"],
-                "name": voice["language"][0]["Language Name"],
-                "language_codes": [voice["language"][0]["Iso Code"]],
+        voices: list[dict[str, Any]] = []
+        for model in self.json_models.values():
+            if not isinstance(model, dict):
+                continue
+            model_id = str(model.get("id", "")).strip()
+            if not model_id:
+                continue
+
+            language_items = model.get("language") or []
+            if not isinstance(language_items, list):
+                language_items = []
+
+            language_codes: list[str] = []
+            model_name: str | None = None
+            for item in language_items:
+                if not isinstance(item, dict):
+                    continue
+                code = str(item.get("Iso Code") or item.get("lang_code") or "").strip()
+                if code and code not in language_codes:
+                    language_codes.append(code)
+                if not model_name:
+                    model_name = str(
+                        item.get("Language Name") or item.get("language_name") or ""
+                    ).strip() or None
+
+            if not model_name:
+                model_name = str(model.get("name") or model_id).strip() or model_id
+
+            voice_data: dict[str, Any] = {
+                "id": model_id,
+                "name": model_name,
+                "language_codes": language_codes or ["unknown"],
                 "gender": "N",
+                "model_type": model.get("model_type"),
+                "developer": model.get("developer"),
+                "num_speakers": model.get("num_speakers"),
+                "sample_rate": model.get("sample_rate"),
+                "quality": model.get("quality"),
             }
-            for voice in self.json_models.values()
-            if voice["id"].startswith("mms_")
-        ]
+            voices.append(voice_data)
+
+        return voices
 
     def set_voice(
         self, voice_id: str | None = None, lang_id: str | None = None

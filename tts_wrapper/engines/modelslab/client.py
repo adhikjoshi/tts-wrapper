@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from typing import TYPE_CHECKING, Any, Callable
 
@@ -157,11 +158,11 @@ class ModelsLabClient(AbstractTTS):
 
         # Strip SSML tags if present (ModelsLab uses plain text)
         if self._is_ssml(text_str):
-            text_str = str(text)
+            text_str = re.sub(r"<[^>]+>", "", text_str).strip()
 
-        # Resolve speed from property overrides
+        # Resolve speed from property overrides; base class defaults rate to ""
         rate = self.get_property("rate")
-        speed = float(rate) if rate is not None else self.speed
+        speed = float(rate) if rate else self.speed
 
         payload: dict[str, Any] = {
             "key": self.api_key,
